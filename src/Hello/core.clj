@@ -5,6 +5,9 @@
         ring.middleware.reload
         ring.middleware.stacktrace
         ring.util.response
+        Hello.middleware
+
+        
 ))
 
 (defn view-layout [& content]
@@ -56,6 +59,7 @@
 
 (def app
   (-> #'handler
+    (wrap-request-logging)
     (wrap-reload '[Hello.core])
     (wrap-stacktrace)))
 
