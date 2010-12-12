@@ -5,19 +5,22 @@
         ring.middleware.reload
         ring.middleware.stacktrace
         ring.util.response
+        ring.middleware.file 
+        ring.middleware.file-info
         Hello.middleware
-
         
 ))
 
 (defn view-layout [& content]
   (html
-    (doctype :xhtml-strict)
+    (doctype :html5)
     (xhtml-tag "en"
       [:head
         [:meta {:http-equiv "Content-type"
                 :content "text/html; charset=utf-8"}]
-        [:title "adder"]]
+        [:title "adder"]
+        [:link {:href "/css/hello.css" :rel "stylesheet" :type "text/css"}]
+      ]
       [:body content])))
 
 
@@ -57,8 +60,11 @@
     (redirect "/"))
 )
 
+
 (def app
   (-> #'handler
+    (wrap-file "web-app")
+    (wrap-file-info)
     (wrap-request-logging)
     (wrap-reload '[Hello.core])
     (wrap-stacktrace)))
