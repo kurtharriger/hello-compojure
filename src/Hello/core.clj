@@ -60,12 +60,21 @@
     (redirect "/"))
 )
 
+(def production?
+  (= "production" (get (System/getenv) "APP_ENV")))
+
+(def development?
+  (not production?))
 
 (def app
-  (-> #'handler
-    (wrap-file "web-app")
-    (wrap-file-info)
-    (wrap-request-logging)
-    (wrap-reload '[Hello.core])
-    (wrap-stacktrace)))
+    (-> #'handler
+      (wrap-file "web-app")
+      (wrap-file-info)
+      (wrap-request-logging)
+      (wrap-if development? wrap-reload '[Hello.middleware Hello.core])
+      (wrap-exception-logging)
+      (wrap-if production?  wrap-failsafe)
+      (wrap-if development? wrap-stacktrace)))
+
+
 
