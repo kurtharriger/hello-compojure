@@ -1,7 +1,9 @@
 (ns Hello.core
   (:use compojure.core
         hiccup.core
-        hiccup.page-helpers))
+        hiccup.page-helpers
+        ring.middleware.reload
+        ring.middleware.stacktrace))
 
         (defn view-layout [& content]
           (html
@@ -30,7 +32,7 @@
         (defn parse-input [a b]
           [(Integer/parseInt a) (Integer/parseInt b)])
 
-        (defroutes app
+        (defroutes handler
           (GET "/" []
             (view-input))
 
@@ -38,3 +40,10 @@
             (let [[a b] (parse-input a b)
                   sum   (+ a b)]
               (view-output a b sum))))
+
+
+        (def app
+          (-> #'handler
+            (wrap-reload '[Hello.core])
+            (wrap-stacktrace)))
+
